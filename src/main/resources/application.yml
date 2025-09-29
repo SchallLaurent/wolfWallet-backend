@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: wolfWallet-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/budgetdb
+    username: budget_user
+    password: budget_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.wolfWallet: DEBUG
