@@ -1,5 +1,7 @@
 package com.wolfWallet.service;
 
+import com.wolfWallet.exception.DuplicateResourceException;
+import com.wolfWallet.exception.ResourceNotFoundException;
 import com.wolfWallet.model.dto.CreateUserRequest;
 import com.wolfWallet.model.dto.UserDTO;
 import com.wolfWallet.model.entity.User;
@@ -20,36 +22,29 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Créer un utilisateur
     public UserDTO createUser(CreateUserRequest request) {
 
-        // Vérifier si username existe déjà
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new DuplicateResourceException("Username '" + request.getUsername() + "' already exists");
         }
 
-        // Vérifier si email existe déjà
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("Email '" + request.getEmail() + "' already exists");
         }
 
-        // Créer l'entité
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // ← MODIFICATION
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setCurrency(request.getCurrency());
 
-        // Sauvegarder
         User savedUser = userRepository.save(user);
 
-        // Convertir en DTO
         return convertToDTO(savedUser);
     }
 
-    // Récupérer tous les utilisateurs
     @Transactional(readOnly = true)
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll()
@@ -58,23 +53,20 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // Récupérer un utilisateur par ID
     @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return convertToDTO(user);
     }
 
-    // Supprimer un utilisateur
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
+            throw new ResourceNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
     }
 
-    // Méthode utilitaire pour convertir Entity -> DTO
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());

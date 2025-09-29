@@ -19,6 +19,4 @@ public class UserDTO {
     private String currency;
     private Boolean active;
     private LocalDateTime createdAt;
-
-    // Note : pas de password ici pour la sécurité !
 }
