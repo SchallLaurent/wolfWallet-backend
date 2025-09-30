@@ -31,9 +31,10 @@ public class Transaction {
     @Column(nullable = false, length = 20)
     private TransactionType type;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private TransactionCategory category;
+    // ← CHANGEMENT ICI : relation vers Category au lieu d'un enum
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(length = 255)
     private String description;

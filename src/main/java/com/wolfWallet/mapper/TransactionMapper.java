@@ -2,6 +2,7 @@ package com.wolfWallet.mapper;
 
 import com.wolfWallet.model.dto.CreateTransactionRequest;
 import com.wolfWallet.model.dto.TransactionDTO;
+import com.wolfWallet.model.entity.Category;
 import com.wolfWallet.model.entity.Transaction;
 import com.wolfWallet.model.entity.User;
 import org.springframework.stereotype.Component;
@@ -20,11 +21,18 @@ public class TransactionMapper {
         dto.setAmount(transaction.getAmount());
         dto.setCurrency(transaction.getCurrency());
         dto.setType(transaction.getType());
-        dto.setCategory(transaction.getCategory());
         dto.setDescription(transaction.getDescription());
         dto.setTransactionDate(transaction.getTransactionDate());
         dto.setCreatedAt(transaction.getCreatedAt());
         dto.setUpdatedAt(transaction.getUpdatedAt());
+
+        // ← MODIFIÉ : Informations de la catégorie
+        if (transaction.getCategory() != null) {
+            dto.setCategoryId(transaction.getCategory().getId());
+            dto.setCategoryName(transaction.getCategory().getName());
+            dto.setCategoryColor(transaction.getCategory().getColor());
+            dto.setCategoryIcon(transaction.getCategory().getIcon());
+        }
 
         // Informations du user
         if (transaction.getUser() != null) {
@@ -36,7 +44,7 @@ public class TransactionMapper {
     }
 
     // CreateRequest → Entity
-    public Transaction toEntity(CreateTransactionRequest request, User user) {
+    public Transaction toEntity(CreateTransactionRequest request, User user, Category category) {
         if (request == null) {
             return null;
         }
@@ -45,7 +53,7 @@ public class TransactionMapper {
         transaction.setAmount(request.getAmount());
         transaction.setCurrency(request.getCurrency());
         transaction.setType(request.getType());
-        transaction.setCategory(request.getCategory());
+        transaction.setCategory(category); // ← MODIFIÉ
         transaction.setDescription(request.getDescription());
         transaction.setTransactionDate(request.getTransactionDate());
         transaction.setUser(user);

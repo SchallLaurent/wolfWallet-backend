@@ -5,28 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionDTO {
+public class CategoryDTO {
     private Long id;
-    private BigDecimal amount;
-    private String currency;
-    private TransactionType type;
-
-    // ← MODIFIÉ : Infos de la catégorie
-    private Long categoryId;
-    private String categoryName;
-    private String categoryColor;
-    private String categoryIcon;
-
+    private String name;
     private String description;
-    private LocalDateTime transactionDate;
+    private TransactionType type;
+    private String color;
+    private String icon;
+    private Boolean isDefault;
     private Long userId;
-    private String userEmail;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

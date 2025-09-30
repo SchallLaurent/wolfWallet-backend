@@ -50,15 +50,27 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions = new ArrayList<>();
 
-    // Méthode helper pour ajouter une transaction
+    // ← NOUVELLE RELATION
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> customCategories = new ArrayList<>();
+
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
         transaction.setUser(this);
     }
 
-    // Méthode helper pour retirer une transaction
     public void removeTransaction(Transaction transaction) {
         transactions.remove(transaction);
         transaction.setUser(null);
+    }
+
+    public void addCategory(Category category) {
+        customCategories.add(category);
+        category.setUser(this);
+    }
+
+    public void removeCategory(Category category) {
+        customCategories.remove(category);
+        category.setUser(null);
     }
 }

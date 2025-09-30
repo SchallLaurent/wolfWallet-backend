@@ -2,9 +2,11 @@ package com.wolfWallet.service;
 
 import com.wolfWallet.model.dto.*;
 import com.wolfWallet.mapper.TransactionMapper;
+import com.wolfWallet.model.entity.Category;
 import com.wolfWallet.model.entity.Transaction;
 import com.wolfWallet.model.entity.TransactionType;
 import com.wolfWallet.model.entity.User;
+import com.wolfWallet.repository.CategoryRepository;
 import com.wolfWallet.repository.TransactionRepository;
 import com.wolfWallet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,8 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
-
 
     // CREATE
     @Transactional
@@ -33,8 +35,18 @@ public class TransactionService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + request.getUserId()));
 
+        // Vérifier que la catégorie existe
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Catégorie non trouvée avec l'ID : " + request.getCategoryId()));
+
+        // Vérifier que la catégorie est bien disponible pour cet user
+        // (soit catégorie par défaut, soit catégorie perso de l'user)
+        if (!category.getIsDefault() && !category.getUser().getId().equals(request.getUserId())) {
+            throw new RuntimeException("Cette catégorie n'est pas disponible pour cet utilisateur");
+        }
+
         // Créer la transaction
-        Transaction transaction = transactionMapper.toEntity(request, user);
+        Transaction transaction = transactionMapper.toEntity(request, user, category);
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         return transactionMapper.toDTO(savedTransaction);
@@ -73,6 +85,14 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
+    // READ - Transactions par catégorie
+    public List<TransactionDTO> getTransactionsByCategory(Long userId, Long categoryId) {
+        List<Transaction> transactions = transactionRepository.findByUserIdAndCategoryId(userId, categoryId);
+        return transactions.stream()
+                .map(transactionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     // READ - Résumé des transactions (revenus, dépenses, balance)
     public TransactionSummaryDTO getTransactionSummary(Long userId) {
         BigDecimal totalIncome = transactionRepository.calculateTotalIncome(userId);
@@ -104,8 +124,17 @@ public class TransactionService {
         if (request.getType() != null) {
             transaction.setType(request.getType());
         }
-        if (request.getCategory() != null) {
-            transaction.setCategory(request.getCategory());
+        // Mise à jour de la catégorie
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Catégorie non trouvée avec l'ID : " + request.getCategoryId()));
+
+            // Vérifier que la catégorie est disponible pour cet user
+            if (!category.getIsDefault() && !category.getUser().getId().equals(transaction.getUser().getId())) {
+                throw new RuntimeException("Cette catégorie n'est pas disponible pour cet utilisateur");
+            }
+
+            transaction.setCategory(category);
         }
         if (request.getDescription() != null) {
             transaction.setDescription(request.getDescription());

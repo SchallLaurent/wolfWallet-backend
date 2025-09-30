@@ -1,6 +1,5 @@
 package com.wolfWallet.model.dto;
 
-import com.wolfWallet.model.entity.TransactionCategory;
 import com.wolfWallet.model.entity.TransactionType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -27,8 +26,9 @@ public class CreateTransactionRequest {
     @NotNull(message = "Le type de transaction est obligatoire")
     private TransactionType type;
 
+    // ← MODIFIÉ : categoryId au lieu de category enum
     @NotNull(message = "La catégorie est obligatoire")
-    private TransactionCategory category;
+    private Long categoryId;
 
     @Size(max = 255, message = "La description ne peut pas dépasser 255 caractères")
     private String description;

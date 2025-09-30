@@ -1,6 +1,5 @@
 package com.wolfWallet.model.dto;
 
-import com.wolfWallet.model.entity.TransactionCategory;
 import com.wolfWallet.model.entity.TransactionType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -26,7 +25,8 @@ public class UpdateTransactionRequest {
 
     private TransactionType type;
 
-    private TransactionCategory category;
+    // ← MODIFIÉ : categoryId au lieu de category enum
+    private Long categoryId;
 
     @Size(max = 255, message = "La description ne peut pas dépasser 255 caractères")
     private String description;

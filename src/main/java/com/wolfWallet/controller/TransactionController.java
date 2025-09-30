@@ -20,28 +20,24 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    // CREATE - Créer une nouvelle transaction
     @PostMapping
     public ResponseEntity<TransactionDTO> createTransaction(@Valid @RequestBody CreateTransactionRequest request) {
         TransactionDTO createdTransaction = transactionService.createTransaction(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
     }
 
-    // READ - Récupérer toutes les transactions d'un utilisateur
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<TransactionDTO>> getUserTransactions(@PathVariable Long userId) {
         List<TransactionDTO> transactions = transactionService.getAllUserTransactions(userId);
         return ResponseEntity.ok(transactions);
     }
 
-    // READ - Récupérer une transaction par ID
     @GetMapping("/{id}")
     public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable Long id) {
         TransactionDTO transaction = transactionService.getTransactionById(id);
         return ResponseEntity.ok(transaction);
     }
 
-    // READ - Récupérer les transactions par type (INCOME ou EXPENSE)
     @GetMapping("/user/{userId}/type/{type}")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByType(
             @PathVariable Long userId,
@@ -50,7 +46,6 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
-    // READ - Récupérer les transactions entre deux dates
     @GetMapping("/user/{userId}/period")
     public ResponseEntity<List<TransactionDTO>> getTransactionsBetweenDates(
             @PathVariable Long userId,
@@ -60,14 +55,21 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
-    // READ - Récupérer le résumé des transactions (revenus, dépenses, balance)
+    // ← NOUVEAU : Récupérer les transactions par catégorie
+    @GetMapping("/user/{userId}/category/{categoryId}")
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByCategory(
+            @PathVariable Long userId,
+            @PathVariable Long categoryId) {
+        List<TransactionDTO> transactions = transactionService.getTransactionsByCategory(userId, categoryId);
+        return ResponseEntity.ok(transactions);
+    }
+
     @GetMapping("/user/{userId}/summary")
     public ResponseEntity<TransactionSummaryDTO> getTransactionSummary(@PathVariable Long userId) {
         TransactionSummaryDTO summary = transactionService.getTransactionSummary(userId);
         return ResponseEntity.ok(summary);
     }
 
-    // UPDATE - Modifier une transaction
     @PutMapping("/{id}")
     public ResponseEntity<TransactionDTO> updateTransaction(
             @PathVariable Long id,
@@ -76,14 +78,12 @@ public class TransactionController {
         return ResponseEntity.ok(updatedTransaction);
     }
 
-    // DELETE - Supprimer une transaction (soft delete)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
 
-    // DELETE - Supprimer définitivement une transaction (hard delete)
     @DeleteMapping("/{id}/permanent")
     public ResponseEntity<Void> permanentDeleteTransaction(@PathVariable Long id) {
         transactionService.permanentDeleteTransaction(id);
