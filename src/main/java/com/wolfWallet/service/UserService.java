@@ -5,6 +5,7 @@ import com.wolfWallet.exception.ResourceNotFoundException;
 import com.wolfWallet.model.dto.CreateUserRequest;
 import com.wolfWallet.model.dto.UserDTO;
 import com.wolfWallet.model.entity.User;
+import com.wolfWallet.model.entity.UserRole;
 import com.wolfWallet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,8 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setCurrency(request.getCurrency());
+        user.setRole(request.getRole() != null ? request.getRole() : UserRole.USER); // ✅ LIGNE CORRIGÉE
+        user.setActive(true);
 
         User savedUser = userRepository.save(user);
 
@@ -69,6 +72,7 @@ public class UserService {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setCurrency(user.getCurrency());
+        dto.setRole(user.getRole().name()); // ✅ LIGNE AJOUTÉE
         dto.setActive(user.getActive());
         dto.setCreatedAt(user.getCreatedAt());
         return dto;

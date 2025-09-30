@@ -17,5 +17,6 @@ public class UserDTO {
     private String lastName;
     private String currency;
     private Boolean active;
+    private String role;
     private LocalDateTime createdAt;
 }

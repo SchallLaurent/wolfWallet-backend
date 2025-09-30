@@ -37,6 +37,10 @@ public class User {
     @Column(nullable = false, length = 3)
     private String currency;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role = UserRole.USER;
+
     @Column(nullable = false)
     private Boolean active = true;
 
