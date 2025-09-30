@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,40 +22,43 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 50)
-    private String username;
-
-    @Column(unique = true, nullable = false, length = 100)
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
-
     @Column(length = 50)
     private String firstName;
 
     @Column(length = 50)
     private String lastName;
 
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(nullable = false, length = 255)
+    private String password;
+
     @Column(nullable = false, length = 3)
-    private String currency = "EUR";
+    private String currency;
 
     @Column(nullable = false)
     private Boolean active = true;
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
+
+    // Méthode helper pour ajouter une transaction
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+        transaction.setUser(this);
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    // Méthode helper pour retirer une transaction
+    public void removeTransaction(Transaction transaction) {
+        transactions.remove(transaction);
+        transaction.setUser(null);
     }
 }

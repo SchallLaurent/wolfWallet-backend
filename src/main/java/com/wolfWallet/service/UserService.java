@@ -24,16 +24,11 @@ public class UserService {
 
     public UserDTO createUser(CreateUserRequest request) {
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new DuplicateResourceException("Username '" + request.getUsername() + "' already exists");
-        }
-
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email '" + request.getEmail() + "' already exists");
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
@@ -70,7 +65,6 @@ public class UserService {
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
